@@ -1,0 +1,59 @@
+Node.js and Express.js - Key Concepts
+========================================
+
+Node.js -
+Node.js is a runtime environment that allows you to run JavaScript outside the browser.
+It uses Google's V8 JavaScript engine (the same engine used in Chrome).
+It is designed for building fast, scalable server-side applications.
+
+Key Characteristics:
+- Non-blocking I/O: Node.js doesn't wait for operations (like reading files or database queries) to complete. It moves to the next task and handles results via callbacks/promises.
+- Single-threaded with Event Loop: Like browser JS, Node.js runs on a single thread but uses an event loop to handle concurrent operations efficiently.
+- Built on V8 Engine: The same engine Chrome uses to run JavaScript, compiled to machine code for speed.
+
+Node.js vs Browser JavaScript:
+- Browser has: window, document, DOM, localStorage, sessionStorage
+- Node.js has: global, process, fs (file system), http, path, os
+- Both share: console, setTimeout, setInterval, Promise, async/await, JSON
+
+The Event Loop in Node.js:
+1. Timers Phase: Executes setTimeout and setInterval callbacks
+2. I/O Callbacks Phase: Executes I/O callbacks (file system, networking)
+3. Poll Phase: Retrieves new I/O events, executes I/O-related callbacks
+4. Check Phase: Executes setImmediate() callbacks
+5. Close Phase: Executes close event callbacks (e.g., socket.on('close'))
+
+Express.js -
+Express.js is a minimal and flexible web framework for Node.js.
+It simplifies building web servers and APIs by providing:
+- Easy routing (defining URL endpoints)
+- Middleware support (functions that run between request and response)
+- Request/Response handling utilities
+
+Why Express over raw HTTP module?
+- Raw http module requires manual URL parsing, manual content-type setting, manual body parsing
+- Express does all of this automatically with cleaner syntax
+
+REST API Concepts:
+- REST (Representational State Transfer) is an architectural style for APIs
+- Uses HTTP methods: GET (read), POST (create), PUT (update), DELETE (remove)
+- Stateless: Each request contains all information needed to process it
+- Resources are identified by URLs (e.g., /users, /users/1)
+
+HTTP Status Codes:
+- 200: OK (success)
+- 201: Created (resource created successfully)
+- 204: No Content (success, nothing to return)
+- 400: Bad Request (invalid data sent)
+- 401: Unauthorized (not authenticated)
+- 403: Forbidden (authenticated but not authorized)
+- 404: Not Found (resource doesn't exist)
+- 500: Internal Server Error (server-side error)
+
+Request-Response Lifecycle:
+1. Client sends HTTP request (method + URL + headers + body)
+2. Express matches the request to a route
+3. Middleware functions run in order (logging, auth, parsing)
+4. Route handler processes the request
+5. Server sends back HTTP response (status code + headers + body)
+6. Connection closes (or stays open for keep-alive)
