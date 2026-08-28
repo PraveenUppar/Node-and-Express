@@ -25,79 +25,51 @@ server.listen(3000, () => {
 // Request Object (req) — useful properties
 // ============================================
 
-// const server2 = http.createServer((req, res) => {
-//   console.log("Method:", req.method);   // GET, POST, PUT, DELETE
-//   console.log("URL:", req.url);          // /about, /users, /
-//   console.log("Headers:", req.headers);  // { host: 'localhost:3000', ... }
+const server2 = http.createServer((req, res) => {
+  console.log("Method:", req.method); // GET, POST, PUT, DELETE
+  console.log("URL:", req.url); // /about, /users, /
+  console.log("Headers:", req.headers); // { host: 'localhost:3000', ... }
 
-//   res.end("Request received");
-// });
-
-// ============================================
-// Manual Routing (handling different URLs)
-// ============================================
-
-// const server3 = http.createServer((req, res) => {
-//   if (req.url === "/" && req.method === "GET") {
-//     res.writeHead(200, { "Content-Type": "text/html" });
-//     res.end("<h1>Home Page</h1>");
-//   } else if (req.url === "/about" && req.method === "GET") {
-//     res.writeHead(200, { "Content-Type": "text/html" });
-//     res.end("<h1>About Page</h1>");
-//   } else if (req.url === "/api/users" && req.method === "GET") {
-//     // Serving JSON
-//     const users = [
-//       { id: 1, name: "Praveen" },
-//       { id: 2, name: "John" },
-//     ];
-//     res.writeHead(200, { "Content-Type": "application/json" });
-//     res.end(JSON.stringify(users));
-//   } else {
-//     // 404 Not Found
-//     res.writeHead(404, { "Content-Type": "text/html" });
-//     res.end("<h1>404 - Page Not Found</h1>");
-//   }
-// });
-
-// server3.listen(3000);
+  res.end("Request received");
+});
 
 // ============================================
 // Serving JSON Response
 // ============================================
 
-// const server4 = http.createServer((req, res) => {
-//   const data = {
-//     message: "Hello from the API",
-//     timestamp: new Date().toISOString(),
-//   };
+const server4 = http.createServer((req, res) => {
+  const data = {
+    message: "Hello from the API",
+    timestamp: new Date().toISOString(),
+  };
 
-//   res.writeHead(200, { "Content-Type": "application/json" });
-//   res.end(JSON.stringify(data));
-// });
+  res.writeHead(200, { "Content-Type": "application/json" });
+  res.end(JSON.stringify(data));
+});
 
 // ============================================
 // Handling POST Request Body
 // ============================================
 
-// const server5 = http.createServer((req, res) => {
-//   if (req.method === "POST" && req.url === "/api/users") {
-//     let body = "";
+const server5 = http.createServer((req, res) => {
+  if (req.method === "POST" && req.url === "/api/users") {
+    let body = "";
 
-//     // Data comes in chunks
-//     req.on("data", (chunk) => {
-//       body += chunk.toString();
-//     });
+    // Data comes in chunks
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
 
-//     // When all data is received
-//     req.on("end", () => {
-//       const user = JSON.parse(body);
-//       console.log("Received user:", user);
+    // When all data is received
+    req.on("end", () => {
+      const user = JSON.parse(body);
+      console.log("Received user:", user);
 
-//       res.writeHead(201, { "Content-Type": "application/json" });
-//       res.end(JSON.stringify({ message: "User created", user }));
-//     });
-//   }
-// });
+      res.writeHead(201, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ message: "User created", user }));
+    });
+  }
+});
 
 // ============================================
 // Why this is hard without Express

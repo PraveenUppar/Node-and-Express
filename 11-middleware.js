@@ -38,7 +38,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // express.static() — serves static files
-// app.use(express.static("public"));
+app.use(express.static("public"));
 
 // ============================================
 // Custom Middleware — Logger
@@ -50,9 +50,7 @@ function logger(req, res, next) {
   // This runs AFTER the response is sent
   res.on("finish", () => {
     const duration = Date.now() - start;
-    console.log(
-      `${req.method} ${req.url} — ${res.statusCode} — ${duration}ms`
-    );
+    console.log(`${req.method} ${req.url} — ${res.statusCode} — ${duration}ms`);
   });
 
   next();

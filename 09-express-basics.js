@@ -66,10 +66,10 @@ app.get("/error", (req, res) => {
 });
 
 // res.sendFile() — send a file
-// const path = require('path');
-// app.get('/page', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'index.html'));
-// });
+const path = require('path');
+app.get('/page', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // res.redirect() — redirect to another URL
 app.get("/old-page", (req, res) => {

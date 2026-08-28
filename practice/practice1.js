@@ -1,108 +1,147 @@
-// Practice 1: File System Challenge
-// Task: Read a file, modify its content, and write it to a new file.
-// Concepts: fs module, readFile, writeFile, string manipulation
+// Practice 3: Express Routing
+// Task: Create routes for a simple user management system (in-memory).
+// Concepts: express.Router(), route params, query params, modular routes
 
-const fs = require("fs");
-const path = require("path");
+const express = require("express");
+const app = express();
+
+app.use(express.json());
 
 // ============================================
-// Exercise 1: Read and Write
+// In-memory users data
 // ============================================
-// Read the Notes.txt file, convert it to uppercase, and save as UPPERCASE_NOTES.txt
 
-fs.readFile(path.join(__dirname, "..", "Notes.txt"), "utf8", (err, data) => {
-  if (err) {
-    // Note: This reads from the parent directory — the JavaScript Notes.txt
-    console.error("Error reading file:", err.message);
-    return;
+let users = [
+  { id: 1, name: "Praveen", role: "admin", active: true },
+  { id: 2, name: "John", role: "user", active: true },
+  { id: 3, name: "Jane", role: "user", active: false },
+  { id: 4, name: "Alice", role: "moderator", active: true },
+];
+
+let nextId = 5;
+
+// ============================================
+// User Router
+// ============================================
+
+const userRouter = express.Router();
+
+// GET /users — List all users (with optional filters)
+// Try: /users?role=admin  or  /users?active=true
+userRouter.get("/", (req, res) => {
+  let result = [...users];
+
+  // Filter by role
+  if (req.query.role) {
+    result = result.filter((u) => u.role === req.query.role);
   }
 
-  const uppercased = data.toUpperCase();
+  // Filter by active status
+  if (req.query.active !== undefined) {
+    const isActive = req.query.active === "true";
+    result = result.filter((u) => u.active === isActive);
+  }
 
-  fs.writeFile(
-    path.join(__dirname, "uppercase-notes.txt"),
-    uppercased,
-    "utf8",
-    (err) => {
-      if (err) {
-        console.error("Error writing file:", err.message);
-        return;
-      }
-      console.log("Exercise 1: uppercase-notes.txt created!");
-    }
-  );
+  res.json({ count: result.length, users: result });
 });
 
-// ============================================
-// Exercise 2: Line Counter
-// ============================================
-// Read a file and count the number of lines, words, and characters
+// GET /users/:id — Get single user
+userRouter.get("/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const user = users.find((u) => u.id === id);
 
-function fileStats(filePath) {
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) {
-      console.error("Error:", err.message);
-      return;
-    }
-
-    const lines = data.split("\n").length;
-    const words = data.split(/\s+/).filter((w) => w.length > 0).length;
-    const characters = data.length;
-
-    console.log(`\nExercise 2 — File Stats:`);
-    console.log(`Lines: ${lines}`);
-    console.log(`Words: ${words}`);
-    console.log(`Characters: ${characters}`);
-  });
-}
-
-fileStats(path.join(__dirname, "..", "Notes.txt"));
-
-// ============================================
-// Exercise 3: Append Logger
-// ============================================
-// Create a simple logger that appends timestamped messages to a log file
-
-function log(message) {
-  const timestamp = new Date().toISOString();
-  const logEntry = `[${timestamp}] ${message}\n`;
-
-  fs.appendFile(path.join(__dirname, "app.log"), logEntry, "utf8", (err) => {
-    if (err) {
-      console.error("Error logging:", err.message);
-      return;
-    }
-    console.log("Logged:", message);
-  });
-}
-
-log("Application started");
-log("User logged in");
-log("Data fetched successfully");
-
-// ============================================
-// Exercise 4: Directory Lister (using promises)
-// ============================================
-// List all files in the current directory with their sizes
-
-const fsPromises = fs.promises;
-
-async function listFilesWithSize(dirPath) {
-  try {
-    const files = await fsPromises.readdir(dirPath);
-
-    console.log(`\nExercise 4 — Files in ${dirPath}:`);
-    for (const file of files) {
-      const stats = await fsPromises.stat(path.join(dirPath, file));
-      const type = stats.isDirectory() ? "DIR " : "FILE";
-      const size = stats.isFile()
-        ? `${(stats.size / 1024).toFixed(2)} KB`
-        : "-";
-      console.log(`  [${type}] ${file} — ${size}`);
-    }
-  } catch (err) {
-    console.error("Error:", err.message);
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
   }
-}
 
-listFilesWithSize(__dirname);
+  res.json({ user });
+});
+
+// POST /users — Create user
+userRouter.post("/", (req, res) => {
+  const { name, role } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: "Name is required" });
+  }
+
+  const newUser = {
+    id: nextId++,
+    name,
+    role: role || "user",
+    active: true,
+  };
+
+  users.push(newUser);
+  res.status(201).json({ message: "User created", user: newUser });
+});
+
+// PUT /users/:id — Update user
+userRouter.put("/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const index = users.findIndex((u) => u.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const { name, role, active } = req.body;
+  users[index] = { ...users[index], ...{ name, role, active }, id };
+  res.json({ message: "User updated", user: users[index] });
+});
+
+// DELETE /users/:id — Delete user
+userRouter.delete("/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const index = users.findIndex((u) => u.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const deleted = users.splice(index, 1)[0];
+  res.json({ message: "User deleted", user: deleted });
+});
+
+// PATCH /users/:id/toggle — Toggle active status
+userRouter.patch("/:id/toggle", (req, res) => {
+  const id = parseInt(req.params.id);
+  const user = users.find((u) => u.id === id);
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  user.active = !user.active;
+  res.json({ message: `User ${user.active ? "activated" : "deactivated"}`, user });
+});
+
+// Mount router
+app.use("/users", userRouter);
+
+// ============================================
+// Home route
+// ============================================
+
+app.get("/", (req, res) => {
+  res.json({
+    message: "User Management API",
+    endpoints: {
+      "GET /users": "List all users (query: ?role=admin&active=true)",
+      "GET /users/:id": "Get user by ID",
+      "POST /users": "Create user (body: { name, role })",
+      "PUT /users/:id": "Update user",
+      "DELETE /users/:id": "Delete user",
+      "PATCH /users/:id/toggle": "Toggle active status",
+    },
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+app.listen(3000, () => {
+  console.log("User Management API running at http://localhost:3000");
+});

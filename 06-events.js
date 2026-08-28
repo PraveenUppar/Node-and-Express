@@ -81,37 +81,8 @@ emitter.emit("message", "Hello again"); // Nothing happens
 // .removeAllListeners() — Remove all listeners for an event
 // ============================================
 
-// emitter.removeAllListeners("greet");
-// emitter.removeAllListeners(); // Removes ALL listeners for ALL events
-
-// ============================================
-// Extending EventEmitter (creating your own event-driven class)
-// ============================================
-
-class UserNotifier extends EventEmitter {
-  registerUser(name) {
-    console.log(`Registering user: ${name}`);
-    // Do registration logic...
-    this.emit("registered", name); // Emit the event
-  }
-}
-
-const notifier = new UserNotifier();
-
-// Listen for the "registered" event
-notifier.on("registered", (name) => {
-  console.log(`Send welcome email to ${name}`);
-});
-
-notifier.on("registered", (name) => {
-  console.log(`Add ${name} to newsletter`);
-});
-
-notifier.registerUser("Praveen");
-// Output:
-// Registering user: Praveen
-// Send welcome email to Praveen
-// Add Praveen to newsletter
+emitter.removeAllListeners("greet");
+emitter.removeAllListeners(); // Removes ALL listeners for ALL events
 
 // ============================================
 // Real-world use cases

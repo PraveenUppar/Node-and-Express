@@ -9,15 +9,15 @@ const fs = require("fs");
 // ============================================
 
 // Without streams (loads entire file into memory):
-// fs.readFile('./huge-file.txt', (err, data) => {
-//   console.log(data); // If file is 2GB, 2GB goes into memory!
-// });
+fs.readFile("./huge-file.txt", (err, data) => {
+  console.log(data); // If file is 2GB, 2GB goes into memory!
+});
 
 // With streams (processes chunk by chunk):
-// const stream = fs.createReadStream('./huge-file.txt');
-// stream.on('data', (chunk) => {
-//   console.log(chunk); // Each chunk is ~64KB by default
-// });
+const stream = fs.createReadStream("./huge-file.txt");
+stream.on("data", (chunk) => {
+  console.log(chunk); // Each chunk is ~64KB by default
+});
 
 // ============================================
 // Types of Streams
