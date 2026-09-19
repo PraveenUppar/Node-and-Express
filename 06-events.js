@@ -2,6 +2,9 @@
 // Node.js is event-driven. Many built-in modules (http, fs, streams) use events internally.
 // The EventEmitter class lets you create your own custom events.
 
+// The EventEmitter class is defined and exposed by the node:events module:
+
+// import { EventEmitter } from "node:events";
 const EventEmitter = require("events");
 
 // ============================================
@@ -15,9 +18,10 @@ const emitter = new EventEmitter();
 // ============================================
 
 // Register a listener for the "greet" event
-emitter.on("greet", () => {
+const eventFunction = () => {
   console.log("Hello! Someone triggered the greet event.");
-});
+};
+emitter.on("greet", eventFunction);
 
 // Register another listener for the same event (both will run)
 emitter.on("greet", () => {

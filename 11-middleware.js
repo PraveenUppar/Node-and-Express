@@ -18,16 +18,6 @@ const app = express();
 // If you don't call next(), the request STOPS here (hangs forever)
 
 // ============================================
-// Application-level Middleware (app.use)
-// ============================================
-
-// Runs for EVERY request
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url} — ${new Date().toISOString()}`);
-  next(); // Don't forget this! Otherwise request hangs.
-});
-
-// ============================================
 // Built-in Middleware
 // ============================================
 
@@ -39,24 +29,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // express.static() — serves static files
 app.use(express.static("public"));
-
-// ============================================
-// Custom Middleware — Logger
-// ============================================
-
-function logger(req, res, next) {
-  const start = Date.now();
-
-  // This runs AFTER the response is sent
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    console.log(`${req.method} ${req.url} — ${res.statusCode} — ${duration}ms`);
-  });
-
-  next();
-}
-
-app.use(logger);
 
 // ============================================
 // Custom Middleware — Auth Check
@@ -114,61 +86,4 @@ function checkAge(req, res, next) {
 // Both validateUser AND checkAge run before the route handler
 app.post("/register", validateUser, checkAge, (req, res) => {
   res.json({ message: "Registration successful", user: req.body });
-});
-
-// ============================================
-// Router-level Middleware
-// ============================================
-
-const adminRouter = express.Router();
-
-// This middleware runs for ALL routes on adminRouter
-adminRouter.use((req, res, next) => {
-  console.log("Admin route accessed");
-  next();
-});
-
-adminRouter.get("/dashboard", (req, res) => {
-  res.json({ message: "Admin Dashboard" });
-});
-
-adminRouter.get("/users", (req, res) => {
-  res.json({ message: "Admin Users List" });
-});
-
-app.use("/admin", adminRouter);
-
-// ============================================
-// Error-handling Middleware
-// ============================================
-// Must have EXACTLY 4 parameters: (err, req, res, next)
-// Must be defined AFTER all routes
-
-app.get("/fail", (req, res, next) => {
-  // Pass an error to the error handler
-  next(new Error("Something broke!"));
-});
-
-// Error handler (always last)
-app.use((err, req, res, next) => {
-  console.error("Error:", err.message);
-  res.status(500).json({ error: err.message });
-});
-
-// ============================================
-// Middleware Execution Order (IMPORTANT)
-// ============================================
-
-// Middleware runs in the ORDER it's defined
-// Example flow:
-// 1. app.use(logger)          — runs first
-// 2. app.use(express.json())  — runs second
-// 3. app.use(authMiddleware)  — runs third (if defined with app.use)
-// 4. Route handler            — runs last
-
-// Order matters! If auth middleware is before the route, it will check auth.
-// If it's after the route, it never runs for that route.
-
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
 });

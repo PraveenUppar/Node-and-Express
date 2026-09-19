@@ -96,32 +96,6 @@ productRouter.get("/:id", (req, res) => {
 app.use("/products", productRouter);
 
 // ============================================
-// Route Chaining — app.route()
-// ============================================
-
-// Instead of writing app.get, app.post, app.put separately:
-app
-  .route("/books")
-  .get((req, res) => {
-    res.json({ message: "Get all books" });
-  })
-  .post((req, res) => {
-    res.json({ message: "Add a book" });
-  });
-
-app
-  .route("/books/:id")
-  .get((req, res) => {
-    res.json({ message: `Get book ${req.params.id}` });
-  })
-  .put((req, res) => {
-    res.json({ message: `Update book ${req.params.id}` });
-  })
-  .delete((req, res) => {
-    res.json({ message: `Delete book ${req.params.id}` });
-  });
-
-// ============================================
 // 404 Handler (catch-all route)
 // ============================================
 

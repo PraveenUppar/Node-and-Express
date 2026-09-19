@@ -2,6 +2,8 @@
 // The path module helps work with file and directory paths in a cross-platform way.
 // Important because: Windows uses \ (backslash) and Mac/Linux use / (forward slash)
 
+//  SKIP
+
 const path = require("path");
 
 // ============================================

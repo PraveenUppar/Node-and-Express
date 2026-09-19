@@ -8,6 +8,21 @@ const http = require("http");
 // Creating a Basic HTTP Server
 // ============================================
 
+const myfunction = (req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Hello World!");
+};
+const server1 = http.createServer(myfunction);
+
+const listenFunction = () => {
+  console.log("Server running at http://localhost:3000");
+};
+server1.listen(3000, listenFunction);
+
+// ============================================
+// Creating a Basic HTTP Server (Inline)
+// ============================================
+
 const server = http.createServer((req, res) => {
   // req = the incoming request object (what the client sent)
   // res = the response object (what we send back)
@@ -40,10 +55,10 @@ const server2 = http.createServer((req, res) => {
 const server4 = http.createServer((req, res) => {
   const data = {
     message: "Hello from the API",
-    timestamp: new Date().toISOString(),
   };
 
   res.writeHead(200, { "Content-Type": "application/json" });
+  // Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
   res.end(JSON.stringify(data));
 });
 

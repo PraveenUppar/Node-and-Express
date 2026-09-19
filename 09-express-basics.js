@@ -4,6 +4,7 @@
 
 // Install Express: npm install express
 
+// import express from "express";
 const express = require("express");
 const app = express();
 const PORT = 3000;
@@ -45,6 +46,20 @@ app.delete("/users/:id", (req, res) => {
 // Response Methods
 // ============================================
 
+// What you already know how to do manually:
+// res.writeHead(200, { "Content-Type": "text/plain" });
+// res.end("This is plain text");
+
+// What Express's res.send() does internally — literally this, wrapped in one call:
+// res.send("This is plain text");
+
+// What you'd have to do manually with raw Node for JSON:
+// res.writeHead(200, { "Content-Type": "application/json" });
+// res.end(JSON.stringify({ message: "Hello", status: "success" }));
+
+// What res.json() does internally — same thing, one call:
+// res.json({ message: "Hello", status: "success" });
+
 // res.send() — send a string response
 app.get("/text", (req, res) => {
   res.send("This is plain text");
@@ -65,22 +80,15 @@ app.get("/error", (req, res) => {
   res.status(500).send("Internal Server Error");
 });
 
-// res.sendFile() — send a file
-const path = require('path');
-app.get('/page', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// res.redirect() — redirect to another URL
-app.get("/old-page", (req, res) => {
-  res.redirect("/");
-});
-
 // ============================================
 // Parsing Request Body
 // ============================================
 
 // Express needs middleware to parse incoming request bodies
+
+// The body arrives as raw bytes, not as a ready-made JavaScript object.
+// Node itself has no idea what those bytes mean — they could be JSON, plain text, an image, form data, anything.
+// The middleware is responsible for converting those bytes into a JavaScript object that you can work with.
 
 // Parse JSON bodies (for API requests)
 app.use(express.json());
@@ -88,35 +96,8 @@ app.use(express.json());
 // Parse URL-encoded bodies (for form submissions)
 app.use(express.urlencoded({ extended: true }));
 
-// Now you can access req.body
+// Now you can access req.body - if not the body is undefined
 app.post("/submit", (req, res) => {
   console.log("Body:", req.body);
   res.json({ received: req.body });
-});
-
-// ============================================
-// Serving Static Files
-// ============================================
-
-// express.static() serves files from a directory (CSS, images, JS, HTML)
-// app.use(express.static('public'));
-// Now files in /public are accessible:
-// public/style.css → http://localhost:3000/style.css
-// public/image.png → http://localhost:3000/image.png
-
-// ============================================
-// app.all() — handle ALL HTTP methods for a route
-// ============================================
-
-app.all("/any-method", (req, res) => {
-  res.send(`You used the ${req.method} method`);
-});
-
-// ============================================
-// app.use() — run for EVERY request (middleware)
-// ============================================
-
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
-  next(); // Pass to the next middleware/route
 });

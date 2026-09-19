@@ -2,6 +2,7 @@
 // Streams let you read or write data piece by piece (in chunks), instead of loading everything into memory at once.
 // This is crucial for handling large files (videos, logs, datasets).
 
+// import fs from "fs";
 const fs = require("fs");
 
 // ============================================

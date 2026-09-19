@@ -1,34 +1,15 @@
-Node.js and Express.js - Key Concepts
-========================================
-
-Node.js -
-Node.js is a runtime environment that allows you to run JavaScript outside the browser.
-It uses Google's V8 JavaScript engine (the same engine used in Chrome).
-It is designed for building fast, scalable server-side applications.
-
-Key Characteristics:
-- Non-blocking I/O: Node.js doesn't wait for operations (like reading files or database queries) to complete. It moves to the next task and handles results via callbacks/promises.
-- Single-threaded with Event Loop: Like browser JS, Node.js runs on a single thread but uses an event loop to handle concurrent operations efficiently.
-- Built on V8 Engine: The same engine Chrome uses to run JavaScript, compiled to machine code for speed.
-
-Node.js vs Browser JavaScript:
-- Browser has: window, document, DOM, localStorage, sessionStorage
-- Node.js has: global, process, fs (file system), http, path, os
-- Both share: console, setTimeout, setInterval, Promise, async/await, JSON
-
-The Event Loop in Node.js:
-1. Timers Phase: Executes setTimeout and setInterval callbacks
-2. I/O Callbacks Phase: Executes I/O callbacks (file system, networking)
-3. Poll Phase: Retrieves new I/O events, executes I/O-related callbacks
-4. Check Phase: Executes setImmediate() callbacks
-5. Close Phase: Executes close event callbacks (e.g., socket.on('close'))
-
 Express.js -
 Express.js is a minimal and flexible web framework for Node.js.
 It simplifies building web servers and APIs by providing:
 - Easy routing (defining URL endpoints)
 - Middleware support (functions that run between request and response)
 - Request/Response handling utilities
+
+A request has a few distinct parts:
+
+The URL/path — req.params, req.query (e.g. /users/5?sort=asc)
+The headers — metadata like Content-Type (remember, you set this yourself with res.writeHead)
+The body — the actual payload/data, usually sent with POST, PUT, PATCH requests (not GET — a GET request typically has no body)
 
 Why Express over raw HTTP module?
 - Raw http module requires manual URL parsing, manual content-type setting, manual body parsing

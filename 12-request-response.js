@@ -93,10 +93,6 @@ app.get("/headers", (req, res) => {
   console.log(req.headers); // All headers
   console.log(req.headers["content-type"]); // Specific header (lowercase!)
   console.log(req.headers["authorization"]); // Auth header
-
-  // Shortcut for content-type
-  console.log(req.get("Content-Type")); // Same thing, case-insensitive
-
   res.json({ headers: req.headers });
 });
 
@@ -125,48 +121,4 @@ app.get("/status-example", (req, res) => {
   // res.status(400).json({ error: "Bad Request" });
   // res.status(404).json({ error: "Not Found" });
   // res.status(500).json({ error: "Server Error" });
-});
-
-// res.redirect() — redirect to another URL
-app.get("/old-url", (req, res) => {
-  res.redirect("/new-url"); // 302 redirect by default
-  // res.redirect(301, '/new-url');  // 301 permanent redirect
-});
-
-// res.sendFile() — send a file to the client
-app.get("/download", (req, res) => {
-  res.sendFile(path.join(__dirname, "Notes.txt"));
-});
-
-// res.set() — set response headers
-app.get("/custom-headers", (req, res) => {
-  res.set("X-Custom-Header", "MyValue");
-  res.set("Cache-Control", "no-cache");
-  res.json({ message: "Check the response headers!" });
-});
-
-// res.cookie() — set cookies (needs cookie-parser for reading)
-// app.get('/set-cookie', (req, res) => {
-//   res.cookie('username', 'Praveen', { maxAge: 900000, httpOnly: true });
-//   res.send('Cookie set!');
-// });
-
-// ============================================
-// Common Response Patterns
-// ============================================
-
-// Success response pattern
-// res.status(200).json({ success: true, data: result });
-
-// Created response pattern
-// res.status(201).json({ success: true, data: newItem });
-
-// Error response pattern
-// res.status(400).json({ success: false, error: "Validation failed" });
-
-// Not found pattern
-// res.status(404).json({ success: false, error: "Resource not found" });
-
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
 });

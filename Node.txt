@@ -1,0 +1,95 @@
+Node.js and Express.js - Key Concepts
+========================================
+
+Node.js -
+Node.js is a runtime environment that allows you to run JavaScript outside the browser.
+It uses Google's V8 JavaScript engine (the same engine used in Chrome).
+It is designed for building fast, scalable server-side applications.
+
+Key Characteristics:
+- Non-blocking I/O: Node.js doesn't wait for operations (like reading files or database queries) to complete. It moves to the next task and handles results via callbacks/promises.
+- Single-threaded with Event Loop: Like browser JS, Node.js runs on a single thread but uses an event loop to handle concurrent operations efficiently.
+- Built on V8 Engine: The same engine Chrome uses to run JavaScript, compiled to machine code for speed.
+
+Node.js vs Browser JavaScript:
+- Browser has: window, document, DOM, localStorage, sessionStorage
+- Node.js has: global, process, fs (file system), http, path, os
+- Both share: console, setTimeout, setInterval, Promise, async/await, JSON
+
+Important Topic
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Hello World!");
+});
+server.listen(3000, () => { console.log("Server running"); });
+
+Step 1 — Node starts executing your file, top to bottom, on the call stack.
+The call stack is just "the list of function calls currently in progress" — think of it as a stack of plates. 
+When a function is called, its plate goes on top. When it finishes, that plate is removed. 
+Only the top plate is "running" at any moment.
+
+Step 2 — http.createServer(...) gets called.
+This function call goes onto the stack. It runs — but here's the key part — running createServer does NOT run your (req, res) => {...} function. 
+It just registers it, saying "remember this function, and call it later whenever a request comes in." 
+Then createServer finishes and returns a server object. Its plate is removed from the stack.
+
+Step 3 — server.listen(3000, callback) gets called.
+Same idea. This plate goes on the stack, it tells the operating system "start listening for connections on port 3000," 
+registers the second callback (console.log(...)) to run later, and then its own plate comes off.
+
+Step 4 — Your file has no more code. The stack is now empty.
+Normally, an empty call stack means a program exits. But Node doesn't exit here — it keeps running 
+because it knows there are pending things registered (the server is listening, waiting for events).
+
+Step 5 — The event loop starts doing its actual job: repeatedly checking "has anything happened yet?"
+This is the loop. It's not one thing that happens once — it's a while(true)-style cycle running underneath everything, over and over, asking: is there a finished timer? 
+A finished file read? A new network connection?
+
+Step 6 — The port actually starts listening (this takes a tiny moment at the OS level).
+That's an event. Node puts your () => console.log(...) callback into a queue — a waiting line.
+
+Step 7 — The event loop checks: is the call stack empty? Yes. So it takes that callback out of the queue and puts it on the stack. 
+Now it runs — console.log("Server running") prints. It finishes, comes off the stack. Stack is empty again.
+
+Step 8 — Some time later, a browser actually sends a request to your server.
+This is a new event. Node puts your (req, res) => {...} handler into the queue, now carrying the actual req and res for this specific request.
+
+Step 9 — Event loop checks: stack empty? Yes. It moves your handler onto the stack. Now it executes, line by line — res.writeHead(...) goes on the stack, runs, comes off; res.end(...) goes on, runs, comes off. 
+Once the handler itself has nothing left to run, it comes off the stack too.
+
+Step 10 — Stack is empty again. Loop keeps checking, forever. 
+If another browser hits your server a second later, exact same thing happens: queue it, wait for stack to be empty, run it.
+
+
+The Event Loop in Node.js:
+1. Timers Phase: Executes setTimeout and setInterval callbacks
+2. I/O Callbacks Phase: Executes I/O callbacks (file system, networking)
+3. Poll Phase: Retrieves new I/O events, executes I/O-related callbacks
+4. Check Phase: Executes setImmediate() callbacks
+5. Close Phase: Executes close event callbacks (e.g., socket.on('close'))
+
+Callback queue --> if empty --> Event loop --> Checks: is the stack empty yet? --> runs it --> Call stack
+
+the loop above: call stack → hand off slow work → callback queue → event loop → back to call stack
+
+Call stack --> Runs your JS, one line at a time
+Callbacks queue up here until the main thread is ready
+
+This is why the (err, data) => {} callback pattern exists at all. fs.readFile can't just return the file contents normally, 
+because that would mean the thread sits there blocking until the disk read finishes. 
+Instead: kick off the read, keep running other code, and when libuv finishes, drop the callback in the queue — for the event loop to run later.
+
+
+How it handles scale and load
+
+I/O-heavy workloads (APIs, web servers, chat apps — lots of waiting on network/disk): 
+Node is excellent, because one thread can juggle thousands of concurrent connections without blocking on any single one.
+
+CPU-heavy workloads (image processing, heavy math, encryption): 
+Node struggles, because that work happens on the single JS thread and blocks the event loop — nothing else can run until it's done. 
+This is the one real weakness of the model.
+
+Scaling beyond one thread anyway: 
+Node has a cluster module and worker_threads — you can run multiple Node processes (one per CPU core) behind a load balancer, or spin off a real thread for CPU-bound work. 
+So "single-threaded" describes the default JS execution model, not a hard ceiling on what a Node app can do.

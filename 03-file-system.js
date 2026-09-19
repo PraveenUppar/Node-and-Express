@@ -1,6 +1,7 @@
 // File System (fs) Module
 // The fs module lets you work with files — read, write, update, delete, and more.
 
+// import fs from "fs";
 const fs = require("fs");
 
 // ============================================
@@ -81,12 +82,12 @@ fs.mkdir("./new-folder", (err) => {
 });
 
 // Read directory contents
-fs.readdir("./", (err, files) => {
+fs.readdir("./", (err, data) => {
   if (err) {
     console.error("Error reading directory:", err);
     return;
   }
-  console.log("Files in directory:", files);
+  console.log("Files in directory:", data);
 });
 
 // Remove a directory (must be empty)
